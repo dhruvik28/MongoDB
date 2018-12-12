@@ -1,0 +1,339 @@
+SQL Queries:
+
+1)
+select * from Reviews join ((select ReviewID from HotelRvws join (SELECT HotelID FROM Hotels WHERE Name = 'Desert Rose Resort') hID on hID.HotelID = HotelRvws.HotelID) limit 10) spReviewID on spReviewID.ReviewID = Reviews.ReviewID
+
+Results:
+
+ReviewID    AuthorLocation	Title 	Author 	Date 	Service	Cleanliness	Overall 	Value 	Location 	Rooms 	ReviewID
+UR127021251		Best Deal for large families.	pb1bicdic	2012-03-31T04:00:00.000Z	5	4	5	5	4	4	UR127021251
+UR126985135	Sacramento, California	Not what I expected	Nancy I	2012-03-30T04:00:00.000Z	2	2	2	2	5	2	UR126985135
+UR126940047	Milton, Canada	A nice piece of quiet away from the strip!	John E	2012-03-29T04:00:00.000Z	5	5	5	5	5	5	UR126940047
+UR126931566	Singapore	Great value	staycation79	2012-03-29T04:00:00.000Z	5	5	4	5	5	5	UR126931566
+UR126931045	Calgary, Canada	Best off the Strip	Wanda M	2012-03-29T04:00:00.000Z	5	4	5	5	5	5	UR126931045
+UR126874886	East Dorset, Vermont	An Oasis in the Desert	xexec	2012-03-28T04:00:00.000Z	5	5	5	5	5	5	UR126874886
+UR126871376	London	Great value, location and luxury	AJ115	2012-03-28T04:00:00.000Z	5	4	5	5	4	5	UR126871376
+UR126867299	Wisconsin	Comfortable	isabehr	2012-03-28T04:00:00.000Z	5	5	5	4	3	4	UR126867299
+UR126798852	Rochester NY	Peaceful and beautifully maintained.	grammiewags	2012-03-27T04:00:00.000Z	5	5	5	5	4	4	UR126798852
+UR126786229	San Antonio, Texas	Excellent!! Awesome place to stay!	g c	2012-03-27T04:00:00.000Z	5	5	5	5	5	5	UR126786229
+UR127021251		Best Deal for large families.	pb1bicdic	2012-03-31T04:00:00.000Z	5	4	5	5	4	4	UR127021251
+UR126985135	Sacramento, California	Not what I expected	Nancy I	2012-03-30T04:00:00.000Z	2	2	2	2	5	2	UR126985135
+UR126940047	Milton, Canada	A nice piece of quiet away from the strip!	John E	2012-03-29T04:00:00.000Z	5	5	5	5	5	5	UR126940047
+UR126931045	Calgary, Canada	Best off the Strip	Wanda M	2012-03-29T04:00:00.000Z	5	4	5	5	5	5	UR126931045
+UR126874886	East Dorset, Vermont	An Oasis in the Desert	xexec	2012-03-28T04:00:00.000Z	5	5	5	5	5	5	UR126874886
+UR126871376	London	Great value, location and luxury	AJ115	2012-03-28T04:00:00.000Z	5	4	5	5	4	5	UR126871376
+UR126867299	Wisconsin	Comfortable	isabehr	2012-03-28T04:00:00.000Z	5	5	5	4	3	4	UR126867299
+UR126798852	Rochester NY	Peaceful and beautifully maintained.	grammiewags	2012-03-27T04:00:00.000Z	5	5	5	5	4	4	UR126798852
+UR126786229	San Antonio, Texas	Excellent!! Awesome place to stay!	g c	2012-03-27T04:00:00.000Z	5	5	5	5	5	5	UR126786229
+
+
+2)
+select reviews.name as 'Hotel', count(reviews.Name) as NumOfRating from (select Hotels.Name from (select HotelRvws.HotelID from Reviews, HotelRvws where Reviews.ReviewID = HotelRvws.ReviewID limit 5000) numOfH, Hotels where Hotels.HotelID = numOfH.HotelID) reviews group by(reviews.Name) order by NumofRating desc
+
+Results:
+
+Name 	NumOfRating
+Inn at the Market	527
+Hotel Monaco Seattle - a Kimpton Hotel	422
+Mayflower Park	409
+Executive Hotel Pacific	307
+Warwick Seattle Hotel	298
+Crowne Plaza Seattle Downtown Area	272
+MarQueen Hotel	128
+Hilton Seattle	124
+Inn at Queen Anne	121
+Ace Hotel	97
+Moore Hotel	73
+Kings Inn	52
+Hotel Seattle	48
+
+
+3)
+select overall.Name, AVG(overall.Overall) as OverallAverage from (select RID.Name, Reviews.Overall from Reviews join (select distinct Hotels.Name, HotelRvws.ReviewID from Hotels join HotelRvws on HotelRvws.HotelID = Hotels.HotelID limit 500000) RID on RID.ReviewID = Reviews.ReviewID) overall group by(overall.Name) order by OverallAverage desc
+
+Results:
+
+Name 	OverallAverage
+Inn at the Market	4.7206
+Mayflower Park	4.5015
+Miauw Suites	4.5000
+Hotel Monaco Seattle - a Kimpton Hotel	4.4871
+The Sorrento Hotel	4.4807
+Hilton Garden Inn Baltimore White Marsh	4.4444
+Hotel Andra	4.4169
+MarQueen Hotel	4.2656
+Sheraton Seattle Hotel	4.0642
+Ace Hotel	3.9527
+Moore Hotel	3.8176
+Crowne Plaza Seattle Downtown Area	3.7815
+Prime Hotel Principe Torlonia	3.6316
+Inn at Virginia Mason	3.6184
+Renaissance Seattle Hotel	3.5847
+Warwick Seattle Hotel	3.5647
+Sixth Avenue Inn	3.4921
+Hilton Seattle	3.4839
+	3.3500
+Inn at Queen Anne	3.2508
+Executive Hotel Pacific	3.2386
+Quality Inn & Suites Seattle	3.2372
+Kings Inn	1.8269
+Hotel Seattle	1.6786
+
+
+4)
+select finalOverall.Name from (select overall.Name, AVG(overall.Overall) as OverallAverage from (select RID.Name, Reviews.Overall from Reviews join (select distinct Hotels.Name, HotelRvws.ReviewID from Hotels join HotelRvws on HotelRvws.HotelID = Hotels.HotelID limit 500000) RID on RID.ReviewID = Reviews.ReviewID) overall group by(overall.Name) order by OverallAverage desc) finalOverall where finalOverall.OverallAverage = 5.0
+
+Results:
+
+Name
+La Piazzetta di Roma
+Freestanza Accommodation
+Petit Prince
+Residenza Ca Felice
+Centro Pellegrini
+Hotel Konfidentiel
+
+
+5.1)
+select everything.Name, month(everything.Date) as Month, count(*) as Count from(select datetime.Name, cast(datetime.Date as Date) as Date from (select exdate.Name, exdate.Date from (select RID.Name, Reviews.Date from Reviews join (select distinct Hotels.Name, HotelRvws.ReviewID from Hotels join HotelRvws on HotelRvws.HotelID = Hotels.HotelID limit 500000) RID on RID.ReviewID = Reviews.ReviewID) exdate) datetime) everything group by everything.Name, Month
+
+Results:
+
+Name 	Month 	Count
+Hilton Garden Inn Baltimore White Marsh	4	5
+Hilton Garden Inn Baltimore White Marsh	1	3
+Hilton Garden Inn Baltimore White Marsh	12	3
+Hilton Garden Inn Baltimore White Marsh	10	2
+Hilton Garden Inn Baltimore White Marsh	9	1
+Hilton Garden Inn Baltimore White Marsh	8	6
+Hilton Garden Inn Baltimore White Marsh	7	7
+Hilton Garden Inn Baltimore White Marsh	5	4
+Hilton Garden Inn Baltimore White Marsh	11	1
+Hilton Garden Inn Baltimore White Marsh	6	3
+Hilton Garden Inn Baltimore White Marsh	2	1
+Hotel Seattle	1	2
+Hotel Seattle	12	4
+Hotel Seattle	10	8
+Hotel Seattle	9	29
+Hotel Seattle	8	10
+Hotel Seattle	7	9
+Hotel Seattle	6	7
+Hotel Seattle	5	7
+Hotel Seattle	4	3
+Hotel Seattle	11	3
+Hotel Seattle	2	2
+Warwick Seattle Hotel	3	65
+Warwick Seattle Hotel	2	56
+Warwick Seattle Hotel	1	50
+Warwick Seattle Hotel	12	50
+Warwick Seattle Hotel	11	60
+Warwick Seattle Hotel	10	80
+Warwick Seattle Hotel	9	48
+Warwick Seattle Hotel	8	38
+Warwick Seattle Hotel	7	62
+Warwick Seattle Hotel	6	38
+Warwick Seattle Hotel	5	16
+Warwick Seattle Hotel	4	32
+Kings Inn	2	8
+Kings Inn	1	8
+Kings Inn	11	12
+Kings Inn	9	12
+Kings Inn	7	16
+Kings Inn	6	4
+Kings Inn	5	12
+Kings Inn	3	8
+Kings Inn	10	10
+Kings Inn	8	10
+Kings Inn	4	4
+
+
+5.2)
+select everything.Name, day(everything.Date) as Day, count(*) as Count from(select datetime.Name, cast(datetime.Date as Date) as Date from (select exdate.Name, exdate.Date from (select RID.Name, Reviews.Date from Reviews join (select distinct Hotels.Name, HotelRvws.ReviewID from Hotels join HotelRvws on HotelRvws.HotelID = Hotels.HotelID limit 500000) RID on RID.ReviewID = Reviews.ReviewID) exdate) datetime) everything group by everything.Name, Day
+
+Results:
+
+Name 	Day 	Count
+Hilton Garden Inn Baltimore White Marsh	19	2
+Hilton Garden Inn Baltimore White Marsh	30	1
+Hilton Garden Inn Baltimore White Marsh	28	1
+Hilton Garden Inn Baltimore White Marsh	23	2
+Hilton Garden Inn Baltimore White Marsh	14	2
+Hilton Garden Inn Baltimore White Marsh	27	7
+Hilton Garden Inn Baltimore White Marsh	25	2
+Hilton Garden Inn Baltimore White Marsh	13	1
+Hilton Garden Inn Baltimore White Marsh	29	1
+Hilton Garden Inn Baltimore White Marsh	31	1
+Hilton Garden Inn Baltimore White Marsh	26	1
+Hilton Garden Inn Baltimore White Marsh	20	2
+Hilton Garden Inn Baltimore White Marsh	9	2
+Hilton Garden Inn Baltimore White Marsh	2	2
+Hilton Garden Inn Baltimore White Marsh	18	2
+Hilton Garden Inn Baltimore White Marsh	7	2
+Hilton Garden Inn Baltimore White Marsh	6	2
+Hilton Garden Inn Baltimore White Marsh	10	1
+Hilton Garden Inn Baltimore White Marsh	12	1
+Hilton Garden Inn Baltimore White Marsh	8	1
+Hotel Seattle	3	7
+Hotel Seattle	29	4
+Hotel Seattle	20	4
+Hotel Seattle	30	1
+Hotel Seattle	14	2
+Hotel Seattle	6	8
+Hotel Seattle	27	1
+Hotel Seattle	23	10
+Hotel Seattle	10	2
+Hotel Seattle	18	3
+Hotel Seattle	7	2
+Hotel Seattle	22	3
+Hotel Seattle	17	6
+Hotel Seattle	15	3
+Hotel Seattle	19	6
+Hotel Seattle	1	3
+Hotel Seattle	28	5
+Hotel Seattle	24	3
+Hotel Seattle	25	3
+Hotel Seattle	5	3
+Hotel Seattle	26	1
+Hotel Seattle	12	2
+Hotel Seattle	8	2
+Warwick Seattle Hotel	30	17
+Warwick Seattle Hotel	29	22
+Warwick Seattle Hotel	27	34
+Warwick Seattle Hotel	26	12
+Warwick Seattle Hotel	25	14
+Warwick Seattle Hotel	23	10
+Warwick Seattle Hotel	19	22
+Warwick Seattle Hotel	17	22
+Warwick Seattle Hotel	16	14
+Warwick Seattle Hotel	15	26
+Warwick Seattle Hotel	13	20
+Warwick Seattle Hotel	9	28
+Warwick Seattle Hotel	5	16
+Warwick Seattle Hotel	28	24
+Warwick Seattle Hotel	24	20
+Warwick Seattle Hotel	21	24
+Warwick Seattle Hotel	20	32
+Warwick Seattle Hotel	14	22
+Warwick Seattle Hotel	11	20
+Warwick Seattle Hotel	10	22
+Warwick Seattle Hotel	31	16
+Warwick Seattle Hotel	4	34
+Warwick Seattle Hotel	2	18
+Warwick Seattle Hotel	1	14
+Warwick Seattle Hotel	3	12
+Warwick Seattle Hotel	18	18
+Warwick Seattle Hotel	6	8
+Warwick Seattle Hotel	12	12
+Warwick Seattle Hotel	8	10
+Warwick Seattle Hotel	22	20
+Warwick Seattle Hotel	7	12
+Kings Inn	10	6
+Kings Inn	2	2
+Kings Inn	6	10
+Kings Inn	17	4
+Kings Inn	25	6
+Kings Inn	5	2
+Kings Inn	29	6
+Kings Inn	19	4
+Kings Inn	4	6
+Kings Inn	27	4
+Kings Inn	9	4
+Kings Inn	8	2
+Kings Inn	23	8
+Kings Inn	14	6
+Kings Inn	28	4
+Kings Inn	26	2
+Kings Inn	3	2
+Kings Inn	16	2
+Kings Inn	21	2
+Kings Inn	11	8
+Kings Inn	1	2
+Kings Inn	13	2
+Kings Inn	20	4
+Kings Inn	31	2
+Kings Inn	18	2
+Kings Inn	24	2
+
+
+6)
+select Author, count(Author) as NumOfReviews from Reviews group by Author order by NumOfReviews desc
+
+Results:
+
+Author 	NumOfReviews
+A TripAdvisor Member	75503
+lass=	17432
+Posted by an Accorhotels.com traveler	4656
+Posted by an Easytobook.com traveler	262
+Posted by a hotelsgrandparis.com traveler	178
+David S	116
+John S	110
+David M	95
+David B	95
+John C	94
+David H	88
+john m	82
+Paul B	81
+John B	77
+Chris B	75
+david c	72
+John R	72
+John H	71
+John W	70
+ITA_And_RE_a	69
+Paul M	69
+Mike M	68
+Michael S	68
+John D	67
+Mike S	67
+John L	66
+Pawel_EPWR	65
+
+7)
+select year(everything.Date) as Year, count(*) as Count from(select datetime.Name, cast(datetime.Date as Date) as Date from (select exdate.Name, exdate.Date from (select RID.Name, Reviews.Date from Reviews join (select distinct Hotels.Name, HotelRvws.ReviewID from Hotels join HotelRvws on HotelRvws.HotelID = Hotels.HotelID limit 5000) RID on RID.ReviewID = Reviews.ReviewID) exdate) datetime) everything group by Year
+
+Results:
+
+Year 	Count
+2012	946
+2011	3912
+2010	1971
+2009	1270
+2008	995
+2007	757
+2006	563
+2005	345
+2004	48
+2003	8
+2002	1
+
+
+8)
+select Title, count(Title) as TitleCount from Reviews group by Title order by TitleCount desc
+
+Results:
+
+Title 	TitleCount
+great location	11297
+Great Hotel	9704
+Great stay	4052
+Excellent Hotel	3629
+Great place to stay	3554
+Nice Hotel	3503
+Good Location	2803
+Excellent	2731
+great value	2593
+loved it!	2395
+Good value	2118
+Great Hotel!	2101
+Fantastic	2009
+Excellent Location	1952
+Great location!	1920
+Fantastic Hotel	1893
+Perfect location	1869
+Good Hotel	1852
+Great place	1844
+Very nice hotel	1799
+Wonderful hotel	1741
+Very Nice	1731
+Great Experience	1647

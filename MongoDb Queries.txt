@@ -1,0 +1,114 @@
+1)
+
+db.reviews.find({"HotelInfo.Name": "Desert Rose Resort"}).pretty()
+
+2)
+db.reviews.aggregate(
+	[
+	{$project: {HotelName: "$HotelInfo.Name", NumberOfReviews: {$size: "$Reviews"}}},
+	{$sort: {NumberOfReviews: -1}},
+	{$out: "Query2"}
+	]
+)
+
+3)
+db.reviews.aggregate(
+	[
+	{$project: {HotelName: "$HotelInfo.Name", AverageRatings: {$avg: "$Reviews.Ratings.Overall"}}},
+	{$sort: {AverageRatings: -1}},
+	{$out: "Query3"}
+	]
+)
+
+4)
+
+db.reviews.aggregate(
+	[
+	{$project: {HotelName: "$HotelInfo.Name", AverageRatings: {$avg: "$Reviews.Ratings.Overall"}}},
+	{$match: {"AverageRatings": 5}},
+	{$sort: {AverageRatings: -1}},
+	{$out: "Query4"}
+	]
+)
+
+5.1)
+
+db.reviews.aggregate(
+	[
+	{$group: {_id: 
+				
+				{HotelName: "$HotelInfo.Name", month: {$map: {input: "$Reviews.Date", as: "monthTime", in: {$month: "$$monthTime"}}}
+				}
+			}
+	},
+	{$unwind: "$_id.month"},
+	{$group: {_id: "$_id", count: {$sum: 1}}},
+	{$sort: {count: -1}},
+	{$out: "Query51"}
+	]
+)
+
+
+5.2)
+
+db.reviews.aggregate(
+	[
+	{$group: {_id: 
+				
+				{HotelName: "$HotelInfo.Name", day: {$map: {input:"$Reviews.Date", as: "dayTime", in: {$dayOfWeek: "$$dayTime"}}}
+				}
+			}
+	},
+	{$unwind: "$_id.day"},
+
+	{$group: {_id: "$_id", count: {$sum: 1}}},
+	{$sort: {count: -1}},
+	{$out: "Query52"}
+	]
+)
+
+6)
+
+db.reviews.aggregate(
+	[   
+	{$unwind: "$Reviews" },
+	{$project: {AuthorName: "$Reviews.Author"}},
+	{$group: { _id: "$AuthorName", Sum: { $sum: 1 } }},
+	{$project: { _id: 0, Author: "$_id", Sum: 1 } },
+	{$sort: { Sum: -1 } },
+	{$out: "Query6"} ],
+	{ allowDiskUse: true } 
+)
+
+7) // Which year had the highest number of ratings
+
+db.reviews.aggregate(
+	[
+	{$group: {_id:
+				{Year: {$map: {input:"$Reviews.Date", as: "yearTime", in: {$year: "$$yearTime"}}}
+				}
+			}
+	},
+	{$unwind: "$_id.Year"},
+	{$group: {_id: "$_id", count: {$sum: 1}}},
+	{$sort: {count: -1}},
+	{$out: {"Query7"}}
+	]
+)
+
+
+8) // number of times a certain phrase gets used in the reviews
+
+db.reviews.aggregate(
+	[
+	{$unwind: "$Reviews"},
+	{$project: {Title: "$Reviews.Title"}},
+	{$group: {_id: "$Title", Sum: {$sum: 1} }},
+	{$project: {_id: 0, Title: "$_id", Sum: 1}},
+	{$match: {"Title": {$ne: ""}}},
+	{$match: {"Title": {$ne: null}}},
+	{$sort: {Sum: -1}},
+	{$out: "Query8"}
+	],
+	{allowDiskUse: true}
+)
